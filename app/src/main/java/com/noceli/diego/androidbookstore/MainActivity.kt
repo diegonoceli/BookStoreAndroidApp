@@ -2,6 +2,7 @@ package com.noceli.diego.androidbookstore
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.noceli.diego.androidbookapi.Book
@@ -13,9 +14,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bookApi: BookApi
     private lateinit var itemListview: ListView
     private lateinit var adapter: BooksAdapter
+    private lateinit var filterImageView: ImageView
+    private lateinit var favoriteBookManager: FavoriteBookManager
 
-    private val books = mutableListOf<Book>()
+    private val allBooks = mutableListOf<Book>()
     private var startIndex = 0
+    private var showFavoritesOnly = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,22 +27,25 @@ class MainActivity : AppCompatActivity() {
 
         bookApi = BookApi()
 
+        favoriteBookManager = FavoriteBookManager(this)
         itemListview = findViewById(R.id.itemListView)
-        adapter = BooksAdapter(books, this)
+        filterImageView = findViewById(R.id.filterIcon)
+        adapter = BooksAdapter(allBooks, this)
         itemListview.adapter = adapter
 
         loadBooks()
 
         itemListview.setOnItemClickListener { _, _, position, _ ->
-            val selectedBook = books[position] // Get the selected book from your data source
+            val selectedBook = allBooks[position] // Get the selected book from your data source
 
             val intent = Intent(this, BookDetailActivity::class.java)
-            intent.putExtra("title", selectedBook.title)
-            intent.putExtra("author", selectedBook.authors.joinToString(", "))
-            intent.putExtra("description", selectedBook.description)
-            intent.putExtra("buyLink", selectedBook.buyLink)
-            intent.putExtra("imageThumbnail", selectedBook.imageThumbnail)
+            intent.putExtra("book", selectedBook)
             startActivity(intent)
+        }
+
+        filterImageView.setOnClickListener {
+            showFavoritesOnly = !showFavoritesOnly
+            updateBookList()
         }
     }
 
@@ -48,11 +55,21 @@ class MainActivity : AppCompatActivity() {
 
         BookApi().searchBooks(query, maxResult, startIndex,
             onResponse = { booksResponse ->
-                books.addAll(booksResponse)
+                allBooks.addAll(booksResponse.map {
+                    it.copy(isFavorite = favoriteBookManager.isBookFavorite(it.title))
+                })
                 adapter.notifyDataSetChanged()
             },
             onError = { error -> error.printStackTrace() })
 
         startIndex += maxResult
+    }
+
+    private fun updateBookList() {
+        if (showFavoritesOnly) {
+            adapter.updateData(allBooks.filter { it.isFavorite }.toMutableList())
+        } else {
+            loadBooks()
+        }
     }
 }

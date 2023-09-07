@@ -11,7 +11,8 @@ import com.noceli.diego.androidbookapi.Book
 import com.noceli.diego.androidbookstore.R
 import com.squareup.picasso.Picasso
 
-class BooksAdapter(private val books: List<Book>, private val context: Context) : BaseAdapter() {
+class BooksAdapter(private val books: MutableList<Book>, private val context: Context) :
+    BaseAdapter() {
 
     override fun getCount(): Int {
         return books.size
@@ -39,6 +40,12 @@ class BooksAdapter(private val books: List<Book>, private val context: Context) 
         Picasso.get().load(book.imageThumbnail).into(thumbnailImageView)
 
         return view
+    }
+
+    fun updateData(newData: List<Book>) {
+        books.clear()
+        books.addAll(newData)
+        notifyDataSetChanged()
     }
 }
 
