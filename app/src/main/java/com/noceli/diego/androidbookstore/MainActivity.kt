@@ -2,6 +2,7 @@ package com.noceli.diego.androidbookstore
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.AbsListView
 import android.widget.ImageView
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +35,24 @@ class MainActivity : AppCompatActivity() {
         itemListview.adapter = adapter
 
         loadBooks()
+
+        itemListview.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
+
+            override fun onScroll(
+                view: AbsListView?,
+                firstVisibleItem: Int,
+                visibleItemCount: Int,
+                totalItemCount: Int
+            ) {
+                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+                    startIndex = totalItemCount
+                    updateBookList()
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }
+        )
 
         itemListview.setOnItemClickListener { _, _, position, _ ->
             val selectedBook = allBooks[position] // Get the selected book from your data source
