@@ -1,6 +1,5 @@
 package com.noceli.diego.androidbookapi
 
-import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

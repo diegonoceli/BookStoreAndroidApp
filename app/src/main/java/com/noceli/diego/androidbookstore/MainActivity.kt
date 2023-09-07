@@ -1,10 +1,9 @@
 package com.noceli.diego.androidbookstore
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ListView
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
 import com.noceli.diego.androidbookapi.Book
 import com.noceli.diego.androidbookapi.BookApi
 import com.noceli.diego.androidbookstore.adapters.BooksAdapter

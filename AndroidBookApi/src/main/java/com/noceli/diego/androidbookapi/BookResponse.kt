@@ -1,7 +1,5 @@
 package com.noceli.diego.androidbookapi
 
-import java.net.URL
-
 data class BookResponse(
     val id: String,
     val volumeInfo: VolumeInfo,
