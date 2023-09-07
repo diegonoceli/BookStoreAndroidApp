@@ -23,8 +23,18 @@ class BookApi {
         query: String,
         maxResults: Int,
         startIndex: Int,
-        callback: Callback<BooksResponse<Book>>
+        onResponse: (List<Book>) -> Unit,
+        onError: (Throwable) -> Unit
     ) {
+        val callback = ApiResponseCallback<BooksListResponse<BookResponse>>()
+        callback.onResponse { response ->
+            response?.let { response ->
+                val books = response.items.map { it.toBook() }
+                onResponse(books)
+            }
+                ?: onResponse(emptyList())
+        }
+        callback.onError { error -> onError(error) }
         apiService.searchBooks(query, maxResults, startIndex).enqueue(callback)
     }
 }
