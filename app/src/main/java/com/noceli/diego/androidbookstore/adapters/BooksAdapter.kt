@@ -42,7 +42,7 @@ class BooksAdapter(private val books: MutableList<Book>, private val context: Co
         return view
     }
 
-    fun updateData(newData: List<Book>) {
+    fun updateData(newData: MutableList<Book>) {
         books.clear()
         books.addAll(newData)
         notifyDataSetChanged()

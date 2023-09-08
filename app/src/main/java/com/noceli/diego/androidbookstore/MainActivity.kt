@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var favoriteBookManager: FavoriteBookManager
 
     private val allBooks = mutableListOf<Book>()
+    private val adapterBooks = mutableListOf<Book>()
     private var startIndex = 0
     private var showFavoritesOnly = false
 
@@ -31,10 +32,10 @@ class MainActivity : AppCompatActivity() {
         favoriteBookManager = FavoriteBookManager(this)
         itemListview = findViewById(R.id.itemListView)
         filterImageView = findViewById(R.id.filterIcon)
-        adapter = BooksAdapter(allBooks, this)
+        adapter = BooksAdapter(adapterBooks, this)
         itemListview.adapter = adapter
 
-        loadBooks()
+        loadMoreBooks()
 
         itemListview.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
@@ -45,17 +46,18 @@ class MainActivity : AppCompatActivity() {
                 visibleItemCount: Int,
                 totalItemCount: Int
             ) {
-                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+                if (firstVisibleItem + visibleItemCount >= totalItemCount
+                    && totalItemCount != 0 && !showFavoritesOnly
+                ) {
                     startIndex = totalItemCount
-                    updateBookList()
+                    loadMoreBooks()
                     adapter.notifyDataSetChanged()
                 }
             }
-        }
-        )
+        })
 
         itemListview.setOnItemClickListener { _, _, position, _ ->
-            val selectedBook = allBooks[position] // Get the selected book from your data source
+            val selectedBook = allBooks[position]
 
             val intent = Intent(this, BookDetailActivity::class.java)
             intent.putExtra("book", selectedBook)
@@ -68,15 +70,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadBooks() {
+    private fun loadMoreBooks() {
         val query = "ios"
         val maxResult = 20
 
-        BookApi().searchBooks(query, maxResult, startIndex,
+        BookApi().searchBooks(
+            query, maxResult, startIndex,
             onResponse = { booksResponse ->
-                allBooks.addAll(booksResponse.map {
+                val newBooks = booksResponse.map {
                     it.copy(isFavorite = favoriteBookManager.isBookFavorite(it.title))
-                })
+                }
+                allBooks.addAll(newBooks)
+                adapterBooks.addAll(newBooks)
+                adapter.updateData(newBooks.toMutableList())
                 adapter.notifyDataSetChanged()
             },
             onError = { error -> error.printStackTrace() })
@@ -86,9 +92,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateBookList() {
         if (showFavoritesOnly) {
-            adapter.updateData(allBooks.filter { it.isFavorite }.toMutableList())
+            val filteredFavorites = allBooks.filter { it.isFavorite }.toMutableList()
+            adapter.updateData(filteredFavorites)
         } else {
-            loadBooks()
+            adapter.updateData(allBooks)
         }
     }
 }
