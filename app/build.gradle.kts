@@ -45,10 +45,10 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(project(mapOf("path" to ":AndroidBookApi")))
+    implementation("androidx.test:core-ktx:1.5.0")
 
     testImplementation("junit:junit:4.13.2")
-
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.10.3")
 
     // Espresso for UI tests
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
