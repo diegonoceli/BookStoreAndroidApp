@@ -10,5 +10,5 @@ interface GoogleBooksApiService {
         @Query("q") query: String,
         @Query("maxResults") maxResults: Int,
         @Query("startIndex") startIndex: Int
-    ): Call<BooksListResponse<BookResponse>>
+    ): Call<ListResponse<BookResponse>>
 }

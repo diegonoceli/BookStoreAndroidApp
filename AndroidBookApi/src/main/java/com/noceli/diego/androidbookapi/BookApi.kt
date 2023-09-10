@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class BookApi {
     companion object {
-        private const val BASE_URL = "https://www.googleapis.com/books/v1/"
+        const val BASE_URL = "https://www.googleapis.com/books/v1/"
     }
 
     private val apiService: GoogleBooksApiService
@@ -25,10 +25,10 @@ class BookApi {
         onResponse: (List<Book>) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        val callback = ApiResponseCallback<BooksListResponse<BookResponse>>()
+        val callback = ApiResponseCallback<ListResponse<BookResponse>>()
         callback.onResponse { response ->
-            response?.let { response ->
-                val books = response.items.map { it.toBook() }
+            response?.let { listResponse ->
+                val books = listResponse.items.map { it.toBook() }
                 onResponse(books)
             }
                 ?: onResponse(emptyList())
